@@ -58,6 +58,10 @@ Every `main.py` run writes a debug log under `logs/` (override with `--log PATH`
 
 ## Writing a player
 
+Every `4` below is just an example. Replace it with your own group number
+everywhere: the directory name, the class name, and the `--player` code. If
+you are group 7, you use `player_7`, `Player7`, and `--player 7`.
+
 Copy the template directory, renaming it for your group number, and rename the
 class inside it to match. Group 4 would run:
 
@@ -116,6 +120,9 @@ on purpose: this class repo never holds student code.
 
 Do **not** fork this repository. Forks are public, and other groups would see
 your strategy.
+
+As before, `4` and `socks-group-4` below are examples — use your actual group
+number throughout.
 
 1. On this repo, click **Use this template** → **Create a new repository**.
 2. Make it **Private**. Name it `socks-group-<k>` (your group number).

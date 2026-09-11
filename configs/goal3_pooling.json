@@ -1,0 +1,18 @@
+{
+  "name": "goal3_pooling",
+  "description": "Goal 3: is pooling socks better or worse than each roommate keeping a separate drawer? Each pooled cell is matched to a solo cell of the same per-person capacity, so the comparison isolates pooling rather than drawer size: 64 socks shared by 4 is 16 each, against one roommate with 16 of their own. Note that C > unit*n + 10 forces a solo drawer to hold at least 16, which is why the pooled sizes are 64 and 80 rather than the default 40. The n=1 cells stand in for the four separate drawers: each is swept over the same seeds, so the aggregate across seeds is the distribution a single roommate faces alone.",
+  "defaults": {
+    "unit": 4,
+    "days": 360,
+    "timeout": 1.0
+  },
+  "seeds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "cells": [
+    {"label": "pooled n=4 C=64 (16/person)", "players": [["g", 4]], "capacity": 64},
+    {"label": "separate n=1 C=16", "players": [["g", 1]], "capacity": 16},
+    {"label": "pooled n=4 C=80 (20/person)", "players": [["g", 4]], "capacity": 80},
+    {"label": "separate n=1 C=20", "players": [["g", 1]], "capacity": 20},
+    {"label": "pooled n=4 C=64 random", "players": [["r", 4]], "capacity": 64},
+    {"label": "separate n=1 C=16 random", "players": [["r", 1]], "capacity": 16}
+  ]
+}

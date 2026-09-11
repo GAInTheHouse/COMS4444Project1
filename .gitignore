@@ -1,0 +1,31 @@
+# Student group directories. During development these stay local: the TA pulls
+# each group's code on demo day, and nobody wants half-finished strategies in
+# the shared history. The pattern matches player_<digits> only (any number of
+# digits), so players/player_template/ IS committed - it is the thing groups copy.
+players/player_[0-9]*/
+
+# Sweep output. Regenerate with `uv run sweep.py configs/<name>.json`; the
+# configs are committed, the results are not.
+results/
+
+# Per-run debug logs from main.py. Regenerated every invocation.
+logs/
+
+# TA notes. Students get README.md; these stay local.
+GUIDE.md
+CLAUDE.md
+AGENTS.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# macOS
+.DS_Store

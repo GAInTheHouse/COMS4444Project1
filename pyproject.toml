@@ -1,0 +1,37 @@
+[project]
+name = "socks"
+version = "0.1.0"
+description = "COMS 4444 Fall 2026 - Project 1 simulator"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pygame>=2.6.1",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.8",
+    "pytest>=8.0",
+    # Students reach for numpy constantly, and numpy integers are not Python
+    # ints. tests/test_adversarial.py pins what the engine does with them.
+    "numpy>=2.0",
+]
+
+[tool.ruff]
+line-length = 100
+# Deliberately broken sample submissions. They are data for a manual smoke
+# test, not project source: linting them would only ask us to fix the very
+# things they exist to demonstrate, and CI blocks on format and lint.
+extend-exclude = ["tests/fixtures/mock_submissions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "UP", "B", "SIM", "I"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "tab"
+docstring-code-format = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

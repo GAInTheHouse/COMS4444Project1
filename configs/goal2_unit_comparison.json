@@ -1,0 +1,17 @@
+{
+  "name": "goal2_unit_comparison",
+  "description": "Goal 2: does drawing five socks instead of four reduce embarrassment, and by how much? C and the seed set are held constant across both units so the unit is the only thing that varies. C=44 because a five-sock unit with n=4 requires C > 5*4+10 = 30, and 44 is the smallest multiple of 4 that clears it with headroom to spare. Both baselines are swept: greedy shows the effect on a strategy that actually uses the extra sock, random shows the effect with no strategy at all.",
+  "defaults": {
+    "capacity": 44,
+    "days": 360,
+    "timeout": 1.0
+  },
+  "seeds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "grid": {
+    "unit": [4, 5],
+    "players": [
+      [["g", 4]],
+      [["r", 4]]
+    ]
+  }
+}

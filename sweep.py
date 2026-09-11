@@ -344,7 +344,7 @@ def execute_live(
 			idle()
 			try:
 				result = iterator.next(timeout=0.03)
-			except TimeoutError:
+			except mp.TimeoutError:
 				continue
 			done.append(result)
 			on_progress(result, len(done), len(jobs))

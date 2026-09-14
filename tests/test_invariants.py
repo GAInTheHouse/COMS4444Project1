@@ -175,15 +175,18 @@ def test_shades_only_ever_move_toward_grey(seed, budget):
 		before = after
 
 
-def test_a_sock_can_be_worn_more_than_once_a_day():
-	"""Documenting a consequence that is easy to get wrong.
+def test_a_sock_cannot_be_worn_more_than_once_a_day():
+	"""Regression for a live-class report: a professor watched four roommates
+	all dress out of a two-sock drawer, because a worn sock was going straight
+	back into the pool for the next roommate the same day. It must not - a
+	sock a roommate wore this morning is only available again starting
+	tomorrow, no matter how many roommates share the drawer today. So no
+	single sock should ever age by more than one wash inside one day.
 
-	Because worn socks return to the drawer immediately, the number of times a
-	single sock ages in one day is bounded by the roommate count, not by one.
-	An earlier draft of the test above asserted a single fade step and failed
-	on a black sock going 1 -> 3. If this ever starts failing, the sequencing
-	in ``step`` has changed - either socks are being held back until the end of
-	the day, or roommates are drawing simultaneously.
+	(An earlier version of this test asserted the opposite - that reuse within
+	a day was fine because returns landed immediately - and that assumption
+	was the bug. If this ever starts failing again, ``step`` is back to
+	returning socks mid-day instead of queuing them for the next one.)
 	"""
 	from models.sock import Color as C
 
@@ -202,8 +205,7 @@ def test_a_sock_can_be_worn_more_than_once_a_day():
 		return worst
 
 	assert worst_daily_ageing(1) == 1, 'one roommate cannot wear the same sock twice'
-	assert worst_daily_ageing(4) > 1, 'a shared drawer must allow a sock to be reused'
-	assert worst_daily_ageing(4) <= 4, 'a sock cannot be worn more often than there are roommates'
+	assert worst_daily_ageing(4) == 1, 'a sock must not be reused by another roommate the same day'
 
 
 @pytest.mark.parametrize(('seed', 'budget'), scenarios())

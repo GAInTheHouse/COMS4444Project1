@@ -273,13 +273,13 @@ class Engine:
 		selection = self.players[index].select_socks(shades, turn)
 		return self.__validate(selection, len(shades))
 
-	def __dress(self, index: int, record: DayRecord) -> None:
+	def __dress(self, index: int, record: DayRecord, returning: list[Sock]) -> None:
 		offered = self.__draw()
 		shades = tuple(s.shade for s in offered)
 		record.offered[index] = shades
 
 		if len(offered) < 2:
-			self.__go_sockless(index, offered, record)
+			self.__go_sockless(index, offered, record, returning)
 			return
 
 		try:
@@ -310,20 +310,24 @@ class Engine:
 		record.wear_idx[index] = wear
 		record.discard_idx[index] = selection.discard
 
-		drawer = self.drawer
 		random = self.rng.random
 
-		# Worn socks are washed, then returned to the drawer unless the wash
-		# finishes them off. The hole check applies to socks that were already
-		# worn out when drawn.
+		# Worn socks are washed, then queued to return once the whole day has
+		# been dressed - never straight back into `self.drawer`. Socks worn by
+		# one roommate must not be available to a later roommate the same day,
+		# only starting the next one; that is also why C has to exceed
+		# `selection_unit * n`, so a full day's draws never need mid-day
+		# returns to succeed. The hole check applies to socks that were
+		# already worn out when drawn.
 		for sock in (first, second):
 			if sock.worn_out and random() < HOLE_PROBABILITY:
 				self.__discard(sock, record, hole=True)
 			else:
-				drawer.append(sock.washed())
+				returning.append(sock.washed())
 
 		# Unworn socks are returned unaged, or thrown out at the roommate's
-		# discretion. They never get washed, so their shade does not move.
+		# discretion. They never get washed, so their shade does not move -
+		# but they still wait for tomorrow along with everything else.
 		discarded = selection.discard
 		for i, sock in enumerate(offered):
 			if i in wear:
@@ -331,15 +335,18 @@ class Engine:
 			if discarded and i in discarded:
 				self.__discard(sock, record, hole=False)
 			else:
-				drawer.append(sock)
+				returning.append(sock)
 
-	def __go_sockless(self, index: int, offered: list[Sock], record: DayRecord) -> None:
+	def __go_sockless(
+		self, index: int, offered: list[Sock], record: DayRecord, returning: list[Sock]
+	) -> None:
 		"""Fewer than two socks on offer: the roommate cannot dress.
 
 		The player is not consulted - there is no legal Selection over one
 		sock - so this is not a fault and nothing is attributed to the group.
-		The lone sock goes back unworn and unaged: it was never put on, so the
-		drawer keeps it at its current shade for somebody else tomorrow.
+		The lone sock goes back unworn and unaged: it was never put on, so it
+		keeps its current shade for somebody else tomorrow. Tomorrow, not
+		later today - it still queues in `returning` like everything else.
 		"""
 		self.embarrassment[index].append(SOCKLESS_PENALTY)
 		self.__totals[index] += SOCKLESS_PENALTY
@@ -350,7 +357,7 @@ class Engine:
 		record.embarrassment[index] = SOCKLESS_PENALTY
 		record.sockless.append(index)
 
-		self.drawer.extend(offered)
+		returning.extend(offered)
 
 	def __discard(self, sock: Sock, record: DayRecord, hole: bool) -> None:
 		self.pending_discards[sock.color] += 1
@@ -398,8 +405,14 @@ class Engine:
 		self.rng.shuffle(order)
 		record = DayRecord(day=self.day, order=order)
 
+		# Collected here, not appended straight to self.drawer, so that no
+		# roommate can draw a sock a previous roommate wore, discarded-back-in,
+		# or went sockless over earlier the same day. Everything queued today
+		# becomes available starting tomorrow's draw.
+		returning: list[Sock] = []
 		for index in order:
-			self.__dress(index, record)
+			self.__dress(index, record, returning)
+		self.drawer.extend(returning)
 
 		self.__replenish(record)
 		record.budget_remaining = self.budget_remaining

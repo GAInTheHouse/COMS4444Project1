@@ -636,6 +636,60 @@ def test_sockless_days_are_counted_per_player_and_in_total():
 	assert results['total_sockless_days'] == 12
 
 
+# ---------------------------------------------------------------- same-day pool
+
+
+def test_a_sock_worn_by_one_roommate_is_not_offered_to_another_the_same_day():
+	"""Regression: a two-sock drawer must not stretch to dress four roommates
+	in one day. Only whoever draws first can dress; the rest go sockless,
+	because nothing returns to the drawer until the day is over."""
+	engine = build(players=[GreedyPlayer] * 4, capacity=40, days=1)
+	engine.drawer = [pristine(Color.WHITE), pristine(Color.WHITE)]
+
+	record = engine.step()
+
+	total_offered = sum(len(offered) for offered in record.offered.values())
+	assert total_offered == 2, 'the same socks were handed out more than once today'
+	assert len(record.sockless) == 3
+
+
+def test_worn_socks_return_only_at_the_end_of_the_day_not_mid_day():
+	"""Directly checks the drawer never grows back inside a day's loop: with
+	four roommates ahead of it and only two socks to start, the drawer must
+	sit empty for the roommates after the first, not refill from washes."""
+	engine = build(players=[GreedyPlayer] * 4, capacity=40, days=1)
+	engine.drawer = [pristine(Color.WHITE), pristine(Color.WHITE)]
+
+	seen_sizes = []
+	original_draw = engine._Engine__draw
+
+	def spy_draw():
+		seen_sizes.append(len(engine.drawer))
+		return original_draw()
+
+	engine._Engine__draw = spy_draw
+	engine.step()
+
+	# First roommate draws from a full pool of 2; everyone after draws from an
+	# empty one, because the wash from roommate one has not landed yet.
+	assert seen_sizes == [2, 0, 0, 0]
+
+
+def test_returns_are_available_starting_the_next_day():
+	"""What was worn today is exactly tomorrow's pool - not later today."""
+	engine = build(players=[GreedyPlayer] * 4, capacity=40, days=2)
+	engine.drawer = [pristine(Color.WHITE), pristine(Color.WHITE)]
+
+	first = engine.step()
+	assert len(first.sockless) == 3
+	assert len(engine.drawer) == 2, 'washed pair should be back by the end of day 1'
+
+	second = engine.step()
+	total_offered = sum(len(offered) for offered in second.offered.values())
+	assert total_offered == 2
+	assert len(second.sockless) == 3
+
+
 # ---------------------------------------------------------------- short draws
 
 

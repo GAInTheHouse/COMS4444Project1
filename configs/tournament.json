@@ -1,0 +1,18 @@
+{
+  "name": "tournament",
+  "description": "End-of-project standings. Every multiset of the loaded players fills the roommate slots - mixed rosters and all-one-group rosters both, which the handout allows - and each plays every arena across every seed. Groups are ranked by their averages over every run they appeared in; there is deliberately no scoring rule inside a single run.",
+  "notes": [
+    "One fixed budget per tournament run, proportional to days. The instructor ruling: one budget is fine; time elapsed and budget must be proportional. Formula: budget = ceil(days * 7490 / 1080 / 10) * 10. At 1080 days this gives $7490, which --calibrate reproduces from the baselines: worst spend $6800 by g+g+g+g, x1.10, rounded up to a pack.",
+    "The endgame is a cliff, not a slope: above a roster's natural spend the budget does nothing, and one dollar below it the drawer collapses and 65536-point sockless penalties swamp every other signal. The budget must sit on the survivable side for every roster in the field. Measured over 1080 days at C=40: greedy spends $6800 with n=4 because it tosses leftovers whenever leftover covers a pack; random only ~$180, because it never discards. $7490 clears the baselines with the default 10% margin. A group that overspends past $7490 does starve, and that is the intended punishment.",
+    "Re-run --calibrate before the real tournament. The threshold is a property of the entrants' spending, and a class of thriftier or greedier strategies will move it. If you change days, scale the budget by the same factor."
+  ],
+  "roommates": [2, 4],
+  "seeds": [1, 2, 3, 4, 5],
+  "defaults": {
+    "capacity": 40,
+    "unit": 4,
+    "days": 1080,
+    "budget": 7490,
+    "timeout": 1.0
+  }
+}

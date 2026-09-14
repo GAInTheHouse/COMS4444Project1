@@ -1,0 +1,15 @@
+{
+  "name": "goal1_budget_sweep",
+  "description": "Goal 1: given a budget, minimise embarrassment while staying under it long-term. Players, C, days and seeds are held fixed so the budget is the only thing that varies. The values straddle a measured cliff rather than a slope: four greedy roommates at C=40 spend about $22,500 over 3600 days (they toss leftovers whenever leftover money still covers a $10 pack), so anything at or above that is indistinguishable from unlimited, and anything below it exhausts and never recovers - once there is no money for a $10 pack the drawer only shrinks. The rungs are dense around $22,000-$23,000 because that is where the knee sits; below $15,000 the run is already lost and the extra detail buys nothing. 3600 days because a single year is too short for the endgame to appear at all.",
+  "defaults": {
+    "players": [["g", 4]],
+    "capacity": 40,
+    "unit": 4,
+    "days": 3600,
+    "timeout": 1.0
+  },
+  "seeds": [1, 2, 3, 4, 5],
+  "grid": {
+    "budget": [null, 26000, 24000, 23000, 22600, 22500, 22400, 22000, 20000, 15000, 10000, 5000]
+  }
+}

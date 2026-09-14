@@ -1,0 +1,15 @@
+{
+  "name": "goal1_budget_demo",
+  "description": "Projector-scale Goal 1. Four greedy roommates, 360 days. Unlimited spend is about $2230, so the rungs straddle that cliff: $2500 survives, $800 and $200 starve. Use the full goal1_budget_sweep.json (3600 days) for the real measurement.",
+  "defaults": {
+    "players": [["g", 4]],
+    "capacity": 40,
+    "unit": 4,
+    "days": 360,
+    "timeout": 0
+  },
+  "seeds": [1, 2],
+  "grid": {
+    "budget": [null, 2500, 2200, 1800, 800, 200]
+  }
+}

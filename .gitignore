@@ -1,8 +1,17 @@
-# Student group directories. During development these stay local: the TA pulls
-# each group's code on demo day, and nobody wants half-finished strategies in
-# the shared history. The pattern matches player_<digits> only (any number of
-# digits), so players/player_template/ IS committed - it is the thing groups copy.
-players/player_[0-9]*/
+# Real groups submit via PR into players/player_<k>/ on main, matching how
+# previous years' simulators did it (see CONTRIBUTING.md) - those folders are
+# committed, not gitignored. Only these three are excluded: they are the TA's
+# own local demo/test strategies ("Keep", "Cull", the one that crashes every
+# turn), not real submissions, and were never meant to be pushed.
+#
+# Once real group numbers are assigned, rename or remove these if a real
+# group ends up using the same number - `git pull` will refuse to overwrite
+# an untracked local file at the same path rather than silently clobbering
+# it, so the failure mode is a blocked pull, not lost work, but it is still
+# worth clearing out of the way ahead of time.
+players/player_1/
+players/player_2/
+players/player_3/
 
 # Sweep output. Regenerate with `uv run sweep.py configs/<name>.json`; the
 # configs are committed, the results are not.

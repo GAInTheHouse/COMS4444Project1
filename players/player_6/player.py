@@ -52,10 +52,7 @@ class Player6(BasePlayer):
 		return shade <= 64
 
 	def _bucket(self, shade: int) -> int:
-		if self._is_black(shade):
-			value = shade / 65
-		else:
-			value = (shade - 127) / 129
+		value = shade / 65 if self._is_black(shade) else (shade - 127) / 129
 		index = int(value * BUCKETS)
 		if index < 0:
 			return 0

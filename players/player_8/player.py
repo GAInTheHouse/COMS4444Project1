@@ -13,11 +13,54 @@ This directory is not itself discovered - the registry only matches
 ``player_<digits>`` - so the template can never appear in a run as a competitor.
 """
 
+from dataclasses import dataclass
+from itertools import combinations
+
 from models.player import GameContext, PlayerSnapshot, Selection, TurnContext
 from models.player import Player as BasePlayer
 
 
-class PlayerTemplate(BasePlayer):
+@dataclass(frozen=True)
+class SockObservation:
+	"""The day and socks offered, in their original order."""
+
+	day: int
+	offered: tuple[int, ...]
+
+	@property
+	def black_shades(self) -> tuple[int, ...]:
+		shades = []
+		for shade in self.offered:
+			if shade < 65:
+				shades.append(shade)
+		return tuple(shades)
+
+	@property
+	def white_shades(self) -> tuple[int, ...]:
+		shades = []
+		for shade in self.offered:
+			if shade >= 127:  # White socks stop fading at 127.
+				shades.append(shade)
+		return tuple(shades)
+
+
+class SockHistory:
+	"""A separate history for each player."""
+
+	def __init__(self) -> None:
+		self._records: list[SockObservation] = []
+
+	def record(self, *, day: int, offered: tuple[int, ...]) -> None:
+		observation = SockObservation(day=day, offered=tuple(offered))
+		self._records.append(observation)
+
+	@property
+	def records(self) -> tuple[SockObservation, ...]:
+		# Return a tuple so callers cannot change the stored list.
+		return tuple(self._records)
+
+
+class Player8(BasePlayer):
 	"""Rename me to Player<k>, where <k> is your group number."""
 
 	def __init__(self, snapshot: PlayerSnapshot, ctx: GameContext) -> None:
@@ -36,6 +79,7 @@ class PlayerTemplate(BasePlayer):
 		# itself - you cannot preload state into an already-built object. Anything
 		# you want to carry between days lives on self, so initialise it here.
 		self.days_seen = 0
+		self.history = SockHistory()
 
 	def select_socks(self, offered: tuple[int, ...], turn: TurnContext) -> Selection:
 		"""Choose two socks to wear, and decide the fate of the rest.
@@ -99,8 +143,38 @@ class PlayerTemplate(BasePlayer):
 		other groups.
 		"""
 		self.days_seen += 1
+		self.history.record(day=turn.day, offered=offered)
 
-		# Replace everything below with your strategy. This baseline wears the
-		# first two socks it is handed and never discards, which is the
-		# do-nothing behaviour a real strategy should beat.
-		return Selection(wear=(0, 1), discard=())
+		# Edge cases
+		# Handle when a pair of socks cannot be made
+		n = len(offered)
+		if n == 0:
+			return Selection(wear=(), discard=())
+		if n == 1:
+			return Selection(wear=(0,), discard=())
+
+		# Finds the index pair of socks that is closest to 6
+		target = 6
+		best_pair = min(
+			combinations(range(n), 2),
+			key=lambda pair: abs(abs(offered[pair[0]] - offered[pair[1]]) - target),
+		)
+
+		# Create an array of the remaining socks for discard method
+		worn = set(best_pair)
+		unworn = [i for i in range(n) if i not in worn]
+
+		if turn.budget_remaining == 0:
+			return Selection(wear=best_pair, discard=())
+
+		discard = []
+		for i in unworn:
+			shade = offered[i]
+			if shade <= 64:  # Black sock
+				if shade > 58:
+					discard.append(i)
+			else:  # White sock
+				if shade < 133:
+					discard.append(i)
+
+		return Selection(wear=best_pair, discard=tuple(discard))

@@ -112,36 +112,30 @@ Anything that fails to import is printed as a warning and skipped, so a broken
 commit from your group never stops anyone else's run. Check for your code in
 the startup warnings before assuming it ran.
 
-Group directories are gitignored (`players/player_[0-9]*/`, any number of
-digits), so a `git add` of your folder does nothing until you force it. That is
-on purpose: this class repo never holds student code.
-
 ## Submitting your player
 
-Do **not** fork this repository. Forks are public, and other groups would see
-your strategy.
-
-As before, `4` and `socks-group-4` below are examples — use your actual group
-number throughout.
-
-1. On this repo, click **Use this template** → **Create a new repository**.
-2. Make it **Private**. Name it `socks-group-<k>` (your group number).
-3. **Settings → Collaborators** → add the TA's GitHub account.
-4. Clone *your* repo, write the player, then force-add the folder (it is
-   gitignored here so it cannot land in the class history by accident):
+**Fork this repository**, then open a pull request back into `main` — see
+[CONTRIBUTING.md](CONTRIBUTING.md) for the exact steps and rules (you only
+ever touch `players/player_4/`, never anyone else's folder or the simulator
+core). As before, `4` is just an example — use your actual group number
+throughout.
 
 ```
+# on your fork
 cp -r players/player_template players/player_4
 # edit players/player_4/player.py  →  class Player4
 
-git add -f players/player_4
-git commit -m "Player4"
+git add players/player_4
+git commit -m "Group 4: <what changed>"
 git push
 ```
 
-The TA pulls `players/player_4/` from your private repo on demo morning. Logs
-under `logs/` are only on the machine that ran the sim; they are not a
-submission.
+Open the PR against this repo's `main`, name it with your group number, and
+one of us will review and merge it. Once merged, `players/player_4/` lives on
+`main` alongside everyone else's — that's expected, not a leak: other groups
+can see your merged code, the same way this course's simulators have always
+worked. Logs under `logs/` are only on the machine that ran the sim; they are
+not a submission.
 
 `offered` holds `selection_unit` shade values in the range 0–255. Pick two
 indices to wear, and list any of the remaining indices you want thrown out.

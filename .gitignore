@@ -1,0 +1,29 @@
+# Real groups submit via PR into players/player_<k>/ on main, matching how
+# previous years' simulators did it (see CONTRIBUTING.md) - those folders are
+# committed, not gitignored.
+
+# Sweep output. Regenerate with `uv run sweep.py configs/<name>.json`; the
+# configs are committed, the results are not.
+results/
+
+# Per-run debug logs from main.py. Regenerated every invocation.
+logs/
+
+# TA notes. Students get README.md; these stay local.
+GUIDE.md
+CLAUDE.md
+AGENTS.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# macOS
+.DS_Store

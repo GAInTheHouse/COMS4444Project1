@@ -114,24 +114,31 @@ class Player10(BasePlayer):
 		"""
 		self.days_seen += 1
 
-		# check for all pairs within threshold of 6 since embarrassment is 0 for anything less than 6
-		pairs_within_threshold = [
-			p
-			for p in combinations(range(len(offered)), 2)
-			if abs(offered[p[0]] - offered[p[1]]) <= THRESHOLD
-		]
-		if pairs_within_threshold:  # if there are pairs that fall within 6
-			# take the most extreme pair like closest to 255 since we want it to become more grey and uniform - white socks
-			i, j = min(
-				pairs_within_threshold,
-				key=lambda p: self.aging(offered[p[0]]) + self.aging(offered[p[1]]),
-			)
-		else:
-			# if there are no pairs within threshold, be greedy
-			i, j = min(
-				combinations(range(len(offered)), 2),
-				key=lambda p: abs(offered[p[0]] - offered[p[1]]),
-			)
+		# Generate every possible pair of offered socks
+		all_pairs = list(combinations(range(len(offered)), 2))
+
+		# Calculate the actual embarrassment of a pair:
+		# differences of 6 or less all count as 0 embarrassment
+		def embarrassment(p):
+			difference = abs(offered[p[0]] - offered[p[1]])
+			return 0 if difference <= THRESHOLD else difference
+
+		# Find the lowest possible embarrassment this turn
+		min_embarrassment = min(embarrassment(p) for p in all_pairs)
+
+		# Keep every pair tied for that lowest embarrassment
+		best_pairs = [p for p in all_pairs if embarrassment(p) == min_embarrassment]
+
+		# Among equally good embarrassment choices:
+		# 1. prefer the pair with the greatest total aging
+		# 2. if still tied, prefer the pair with average shade closest to 0
+		i, j = min(
+			best_pairs,
+			key=lambda p: (
+				-(self.aging(offered[p[0]]) + self.aging(offered[p[1]])),
+				(offered[p[0]] + offered[p[1]]) / 2,
+			),
+		)
 
 		chosen_age = max(self.aging(offered[i]), self.aging(offered[j]))
 		if turn.total_spent > 0:
